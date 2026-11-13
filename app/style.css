@@ -46,8 +46,10 @@ h1 { font-size: 26px; font-weight: 700; line-height: 1.2; margin-top: 2px; }
   border: 2px solid var(--surface); background: var(--surface); color: var(--ink);
   font: inherit; font-size: 14px; line-height: 1.4; cursor: pointer;
 }
+/* Selected day: solid fill so it stands out (user test, tester 2). Today's day keeps an outline. */
+.days button[aria-current="date"] { border-color: var(--accent); }
 .days button[aria-pressed="true"] {
-  background: var(--accent-soft); color: var(--accent); border-color: var(--accent); font-weight: 700;
+  background: var(--accent); color: var(--surface); border-color: var(--accent); font-weight: 700;
 }
 
 /* Task cards */
@@ -112,6 +114,21 @@ h1 { font-size: 26px; font-weight: 700; line-height: 1.2; margin-top: 2px; }
 }
 
 .check[aria-pressed="true"] span { background: var(--done); border-color: var(--done); color: var(--surface); }
+.label .undo { text-transform: none; letter-spacing: 0; color: var(--done); font-weight: 600; }
+
+/* S1 Pick start date */
+.start { display: grid; gap: 8px; }
+.start input {
+  min-height: 44px; padding: 8px 12px; border-radius: 12px;
+  border: 2px solid var(--control); background: var(--surface); color: var(--ink);
+  font: inherit; font-size: 16px; line-height: 1.4;
+}
+.primary {
+  min-height: 44px; margin-top: 4px; border: 0; border-radius: 999px;
+  background: var(--accent); color: var(--surface);
+  font: inherit; font-size: 16px; font-weight: 600; cursor: pointer;
+}
+.foot { padding: 8px 16px 0; text-align: center; }
 
 /* Headings get focus on view change (for screen readers); no ring needed there. */
 h1[tabindex="-1"]:focus { outline: none; }

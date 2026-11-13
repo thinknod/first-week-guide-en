@@ -32,6 +32,12 @@ New hires lose time in their first week because they don't know where to find th
 2. **Answers to "where / who" questions:** the repeated topics (password, corporate card, meeting rooms, leave). Each answer shows a wiki location and a contact role.
 3. **One page, no login:** works on both phone and laptop. Content comes from a file the buddies write in advance.
 
+**This round** (from `05_user_test.md`, in this order; all within Must)
+1. **A second tap on "Done" must not clear the mark** (tester 3, the only failed task). Ignore a tap that comes right after the first, and make undoing look deliberate (e.g. "Done ✓ · tap to undo").
+2. **Open on the right day** (tester 2). Build S1 "Pick start date" from `03_screen_flow.md`: pick the start date once, save it in the browser, and open on today's day. Make the selected day button easier to see.
+3. **Search finds related words** (tester 4, also tester 1). Buddies fill in `keywords` for every answer (e.g. printing, print, copier for Printer), and the filter matches word stems so "printing" finds "printer". No AI or synonym service (see Not doing).
+- Keep the "Can I ask this?" card as is (tester 5).
+
 **Next**
 - Buddies edit tasks and answers on screen
 - Notifications (e.g. a reminder for today's tasks)

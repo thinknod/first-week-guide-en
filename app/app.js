@@ -2,9 +2,46 @@
   "use strict";
 
   var DONE_KEY = "fwg.done"; // { task_id: { done: true, done_at: "YYYY-MM-DD HH:MM" } }
+  var START_KEY = "fwg.start_date"; // "YYYY-MM-DD", set on S1
+  var REPEAT_TAP_MS = 800; // a second tap this soon after the first is ignored (double-tap / "did it work?")
+  var DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  var MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   var tasks = window.CONTENT.tasks;
   var answers = window.CONTENT.answers;
-  var currentDay = 1;
+  var lastTap = {}; // task_id -> time of the last toggle
+
+  function loadStart() {
+    try { return localStorage.getItem(START_KEY) || ""; } catch (e) { return ""; }
+  }
+  function saveStart(v) {
+    try { localStorage.setItem(START_KEY, v); } catch (e) { /* not saved */ }
+  }
+  var startDate = loadStart();
+
+  function parseDate(s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || "");
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null;
+  }
+  function isoDate(d) {
+    function p(n) { return (n < 10 ? "0" : "") + n; }
+    return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+  }
+  function todayDate() { var n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); }
+
+  // Which day is "today": count working days (Mon–Fri) from the start date; Day 1 = start date.
+  // Returns { day: 1..5, before: bool, after: bool }.
+  function dayInfo() {
+    var start = parseDate(startDate), today = todayDate();
+    if (!start || today < start) return { day: 1, before: !!start, after: false };
+    var count = 0;
+    for (var d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+      var w = d.getDay();
+      if (w !== 0 && w !== 6) count++;
+    }
+    if (count > 5) return { day: 5, before: false, after: true };
+    return { day: Math.max(1, count), before: false, after: false };
+  }
+  var currentDay = dayInfo().day;
 
   // Browser-only storage. If the browser blocks it, the page still works (marks just aren't kept).
   function loadDone() {
@@ -24,6 +61,9 @@
   }
 
   function toggle(id) {
+    var now = Date.now();
+    if (lastTap[id] && now - lastTap[id] < REPEAT_TAP_MS) return;
+    lastTap[id] = now;
     if (isDone(id)) delete marks[id];
     else marks[id] = { done: true, done_at: stamp() };
     saveDone(marks);
@@ -50,10 +90,12 @@
   function renderDayButtons() {
     var nav = document.getElementById("day-buttons");
     nav.textContent = "";
+    var today = dayInfo().day;
     for (var d = 1; d <= 5; d++) {
       var b = el("button", "", "Day " + d);
       b.type = "button";
       b.setAttribute("aria-pressed", d === currentDay ? "true" : "false");
+      if (d === today && startDate) b.setAttribute("aria-current", "date");
       b.addEventListener("click", (function (day) {
         return function () { currentDay = day; render(); };
       })(d));
@@ -75,15 +117,16 @@
       var card = el("div", "card" + (done ? " done" : ""));
       var top = el("div", "top");
       var text = el("div");
-      text.appendChild(el("div", "label", "Task " + (i + 1)));
+      var label = el("div", "label", "Task " + (i + 1));
+      if (done) label.appendChild(el("span", "undo", " · Done ✓ · tap to undo"));
+      text.appendChild(label);
       text.appendChild(el("h2", "", t.title));
       top.appendChild(text);
 
       var btn = el("button", "check");
       btn.type = "button";
       btn.setAttribute("aria-pressed", done ? "true" : "false");
-      btn.setAttribute("aria-label", "Mark '" + t.title + "' done");
-      var mark = el("span", "", "✓");
+      btn.setAttribute("aria-label", "Mark '" + t.title + "' done");      var mark = el("span", "", "✓");
       mark.setAttribute("aria-hidden", "true");
       btn.appendChild(mark);
       btn.addEventListener("click", function () { toggle(t.task_id); });
@@ -99,7 +142,17 @@
   function renderHeader(list) {
     var n = list.filter(function (t) { return isDone(t.task_id); }).length;
     var total = list.length;
-    document.getElementById("day-header").textContent = "Day " + currentDay + " of 5";
+    var info = dayInfo();
+    var head = "Day " + currentDay + " of 5";
+    if (info.before) {
+      var s = parseDate(startDate);
+      head += " · Starts on " + DAY_NAMES[s.getDay()].slice(0, 3) + ", " + MONTHS[s.getMonth()] + " " + s.getDate();
+    } else if (info.after) {
+      head += " · Your first week is done";
+    } else if (currentDay === info.day) {
+      head += " · " + DAY_NAMES[todayDate().getDay()];
+    }
+    document.getElementById("day-header").textContent = head;
     document.getElementById("ring-count").textContent = n + "/" + total;
     var ring = document.getElementById("ring");
     ring.setAttribute("aria-label", n + " of " + total + " tasks done");
@@ -134,8 +187,10 @@
   var views = {
     today: document.getElementById("view-today"),
     ask: document.getElementById("view-ask"),
-    topic: document.getElementById("view-topic")
+    topic: document.getElementById("view-topic"),
+    start: document.getElementById("view-start")
   };
+  var startInput = document.getElementById("start-date");
   var filterBox = document.getElementById("ask-filter");
 
   function findAnswer(id) {
@@ -143,10 +198,22 @@
     return null;
   }
 
+  // Cut a common English ending so "printing" / "printers" find "printer". Keeps at least 3 letters.
+  function stem(w) {
+    var ends = ["ing", "ers", "er", "ed", "es", "s"];
+    for (var i = 0; i < ends.length; i++) {
+      var e = ends[i];
+      if (w.length - e.length >= 3 && w.slice(-e.length) === e) return w.slice(0, -e.length);
+    }
+    return w;
+  }
+
   function matches(a, q) {
     if (!q) return true;
     var hay = [a.topic, a.question || "", a.keywords || ""].join(" ").toLowerCase();
-    return q.toLowerCase().split(/\s+/).every(function (w) { return hay.indexOf(w) !== -1; });
+    return q.toLowerCase().split(/\s+/).every(function (w) {
+      return hay.indexOf(w) !== -1 || hay.indexOf(stem(w)) !== -1;
+    });
   }
 
   function renderAskList() {
@@ -215,7 +282,11 @@
 
   function route() {
     var hash = decodeURIComponent(location.hash.replace(/^#/, ""));
-    if (hash === "ask") {
+    if (!startDate || hash === "start") {
+      // S1: first visit (no start date in this browser yet) or "Change start date".
+      startInput.value = startDate || isoDate(todayDate());
+      show("start", document.getElementById("start-title"));
+    } else if (hash === "ask") {
       renderAskList();
       show("ask", document.getElementById("ask-title"));
     } else if (hash.indexOf("topic/") === 0) {
@@ -225,6 +296,17 @@
       show("today", null);
     }
   }
+
+  document.getElementById("start-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    if (!parseDate(startInput.value)) return;
+    startDate = startInput.value;
+    saveStart(startDate);
+    currentDay = dayInfo().day;
+    render();
+    if (location.hash) location.hash = ""; // hashchange → route()
+    else route();
+  });
 
   filterBox.addEventListener("input", renderAskList);
   window.addEventListener("hashchange", route);

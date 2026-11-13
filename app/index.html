@@ -20,6 +20,26 @@
     <nav class="days" aria-label="Pick a day" id="day-buttons"></nav>
 
     <div class="cards" id="task-list"></div>
+
+    <p class="foot"><a class="back" href="#start">Change start date</a></p>
+  </section>
+
+  <!-- S1 Pick start date (first visit, or index.html#start) -->
+  <section id="view-start" aria-labelledby="start-title" hidden>
+    <header class="head">
+      <div>
+        <div class="small">First-week guide</div>
+        <h1 id="start-title" tabindex="-1">When is your first day?</h1>
+      </div>
+    </header>
+    <form class="cards" id="start-form">
+      <div class="card start">
+        <label class="small" for="start-date">Your first day</label>
+        <input id="start-date" type="date" required>
+        <p class="small">Saved only in this browser. No login.</p>
+        <button type="submit" class="primary">Start</button>
+      </div>
+    </form>
   </section>
 
   <!-- S4 Who do I ask? (open with index.html#ask) -->
