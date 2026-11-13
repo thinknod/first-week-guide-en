@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup C · Calendar</title>
+<style>
+  :root { --ink:#1d1d1f; --muted:#6e6e73; --line:#e5e5ea; --accent:#2f6fde; --bg:#f2f2f7; --done:#34a853; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system, "Segoe UI", Roboto, sans-serif; background:#d9d9de; color:var(--ink); padding:24px 0; }
+  .label { text-align:center; font-size:13px; color:var(--muted); margin-bottom:12px; }
+  .phone { width:390px; min-height:844px; margin:0 auto; background:#fff; border-radius:36px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,.15); display:flex; flex-direction:column; }
+  .status { height:44px; }
+  header { padding:8px 20px 12px; display:flex; justify-content:space-between; align-items:center; }
+  header .m { font-size:15px; font-weight:600; }
+  .gear { border:0; background:none; font-size:22px; color:var(--muted); cursor:pointer; }
+  .week { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; padding:0 14px 14px; border-bottom:1px solid var(--line); }
+  .d { border:0; background:var(--bg); border-radius:14px; padding:10px 0 8px; cursor:pointer; color:var(--ink); font:inherit; }
+  .d .w { font-size:12px; color:var(--muted); }
+  .d .n { font-size:20px; font-weight:600; margin:2px 0 4px; }
+  .d .dots { display:flex; gap:3px; justify-content:center; height:6px; }
+  .d .dots i { width:6px; height:6px; border-radius:50%; background:#c7c7cc; }
+  .d .dots i.on { background:var(--done); }
+  .d.today { outline:2px solid var(--accent); }
+  .d.sel { background:var(--accent); color:#fff; }
+  .d.sel .w { color:#dbe6fb; }
+  .d.sel .dots i { background:#9db8ee; } .d.sel .dots i.on { background:#fff; }
+  .title { padding:16px 20px 4px; }
+  .title .k { font-size:13px; color:var(--muted); }
+  .title h1 { font-size:24px; }
+  ul { list-style:none; padding:4px 20px; }
+  li { display:flex; gap:14px; align-items:center; padding:12px 0; border-bottom:1px solid var(--line); }
+  li input { width:24px; height:24px; accent-color:var(--done); flex:none; }
+  li .t { flex:1; font-size:17px; }
+  li.done .t { color:var(--muted); text-decoration:line-through; }
+  li a { font-size:14px; color:var(--accent); text-decoration:none; }
+  .empty { padding:12px 0; color:var(--muted); font-size:15px; }
+  .ask { margin:auto 20px 32px; padding:16px; border:0; border-radius:14px; background:var(--accent); color:#fff; font-size:17px; font-weight:600; cursor:pointer; }
+</style>
+</head>
+<body>
+<p class="label">Mockup C: Calendar by date · 390 px</p>
+<div class="phone">
+  <div class="status"></div>
+  <header><span class="m">Your first week · Nov 17–21</span><button class="gear" aria-label="Settings">⚙</button></header>
+  <div class="week" id="week"></div>
+  <div class="title"><div class="k" id="kicker"></div><h1 id="heading"></h1></div>
+  <ul id="list"></ul>
+  <button class="ask">Who do I ask?</button>
+</div>
+<script>
+  // Example values from 03_screen_flow.md (Tasks + Done marks). Start date 2026-11-17, today = Day 2.
+  const TODAY = 2;
+  const days = [
+    { day:1, w:'Mon', n:17 }, { day:2, w:'Tue', n:18 }, { day:3, w:'Wed', n:19 },
+    { day:4, w:'Thu', n:20 }, { day:5, w:'Fri', n:21 },
+  ];
+  const tasks = [
+    { id:'d1-01', day:1, title:'Collect your laptop and log in', done:true },
+    { id:'d1-02', day:1, title:'Change your groupware password', answer:true, done:true },
+    { id:'d1-03', day:1, title:'Meet your buddy and team lead', done:false },
+    { id:'d2-01', day:2, title:'Apply for the corporate card', answer:true, done:false },
+    { id:'d2-02', day:2, title:'Book a meeting room for your 1:1 with your buddy', answer:true, done:false },
+    { id:'d3-01', day:3, title:'Read how to request leave', answer:true, done:false },
+    { id:'d5-01', day:5, title:'Week review with your buddy', done:false },
+  ];
+  let sel = TODAY;
+
+  function render() {
+    document.getElementById('week').innerHTML = days.map(d => {
+      const t = tasks.filter(x => x.day === d.day);
+      const dots = t.map(x => `<i class="${x.done ? 'on' : ''}"></i>`).join('');
+      const cls = ['d', d.day === TODAY ? 'today' : '', d.day === sel ? 'sel' : ''].join(' ');
+      return `<button class="${cls}" data-day="${d.day}"><div class="w">${d.w}</div><div class="n">${d.n}</div><div class="dots">${dots}</div></button>`;
+    }).join('');
+    const d = days[sel - 1], t = tasks.filter(x => x.day === sel);
+    const doneN = t.filter(x => x.done).length;
+    document.getElementById('kicker').textContent = `Day ${sel} of 5 · ${doneN} of ${t.length} done`;
+    document.getElementById('heading').textContent = sel === TODAY ? 'Today' : `${d.w}, Nov ${d.n}`;
+    document.getElementById('list').innerHTML = t.length
+      ? t.map(x => `<li class="${x.done ? 'done' : ''}"><input type="checkbox" data-id="${x.id}" ${x.done ? 'checked' : ''} aria-label="Done"><span class="t">${x.title}</span>${x.answer ? '<a href="#">Answer →</a>' : ''}</li>`).join('')
+      : '<li class="empty">No tasks for this day.</li>';
+  }
+  document.getElementById('week').addEventListener('click', e => {
+    const b = e.target.closest('.d'); if (b) { sel = +b.dataset.day; render(); }
+  });
+  document.getElementById('list').addEventListener('change', e => {
+    const t = tasks.find(x => x.id === e.target.dataset.id); if (t) { t.done = e.target.checked; render(); }
+  });
+  render();
+</script>
+</body>
+</html>

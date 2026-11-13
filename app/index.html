@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>First-week guide</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="page">
+  <section id="view-today" aria-labelledby="today-title">
+    <header class="head">
+      <div>
+        <div class="small" id="day-header">Day 1 of 5</div>
+        <h1 id="today-title">Today</h1>
+      </div>
+      <div class="ring" id="ring" role="img" aria-label="0 of 0 tasks done"><span id="ring-count" aria-hidden="true">0/0</span></div>
+    </header>
+
+    <nav class="days" aria-label="Pick a day" id="day-buttons"></nav>
+
+    <div class="cards" id="task-list"></div>
+  </section>
+
+  <!-- S4 Who do I ask? (open with index.html#ask) -->
+  <section id="view-ask" aria-labelledby="ask-title" hidden>
+    <header class="head">
+      <div>
+        <a class="back" href="#">← Today</a>
+        <h1 id="ask-title" tabindex="-1">Who do I ask?</h1>
+      </div>
+    </header>
+    <div class="search">
+      <label class="small" for="ask-filter">Filter by topic or keyword</label>
+      <input id="ask-filter" type="search" autocomplete="off" placeholder="e.g. card">
+    </div>
+    <p class="sr-only" id="ask-count" role="status" aria-live="polite"></p>
+    <div class="cards" id="ask-list"></div>
+  </section>
+
+  <!-- S5 Topic guide (open with index.html#topic/<answer_id>) -->
+  <section id="view-topic" aria-labelledby="topic-title" hidden>
+    <header class="head">
+      <div class="nav-row">
+        <a class="back" href="#ask">← Who do I ask?</a>
+        <a class="back" href="#">Today</a>
+      </div>
+    </header>
+    <div class="cards">
+      <article class="card" id="topic-card"></article>
+    </div>
+  </section>
+</main>
+<script src="content.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

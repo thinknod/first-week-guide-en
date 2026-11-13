@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup A · List</title>
+<style>
+  :root { --ink:#1d1d1f; --muted:#6e6e73; --line:#e5e5ea; --accent:#2f6fde; --bg:#f2f2f7; --done:#34a853; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system, "Segoe UI", Roboto, sans-serif; background:#d9d9de; color:var(--ink); padding:24px 0; }
+  .label { text-align:center; font-size:13px; color:var(--muted); margin-bottom:12px; }
+  .phone { width:390px; min-height:844px; margin:0 auto; background:#fff; border-radius:36px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,.15); display:flex; flex-direction:column; }
+  .status { height:44px; }
+  header { padding:8px 20px 16px; display:flex; justify-content:space-between; align-items:flex-start; }
+  .day { font-size:13px; color:var(--muted); }
+  h1 { font-size:28px; font-weight:700; margin-top:2px; }
+  .gear { border:0; background:none; font-size:22px; color:var(--muted); cursor:pointer; }
+  .progress { padding:0 20px 12px; font-size:14px; color:var(--muted); }
+  .bar { height:4px; background:var(--line); border-radius:2px; margin-top:6px; }
+  .bar i { display:block; height:100%; background:var(--done); border-radius:2px; transition:width .2s; }
+  ul { list-style:none; border-top:1px solid var(--line); }
+  li { display:flex; align-items:center; gap:14px; padding:14px 20px; border-bottom:1px solid var(--line); }
+  li input { width:24px; height:24px; accent-color:var(--done); flex:none; }
+  li .t { flex:1; font-size:17px; }
+  li.done .t { color:var(--muted); text-decoration:line-through; }
+  li a { font-size:14px; color:var(--accent); text-decoration:none; white-space:nowrap; }
+  .left { margin:14px 20px 0; font-size:14px; color:var(--muted); }
+  .left a { color:var(--accent); text-decoration:none; }
+  .ask { margin:auto 20px 32px; padding:16px; border:0; border-radius:14px; background:var(--accent); color:#fff; font-size:17px; font-weight:600; cursor:pointer; }
+  .ask small { display:block; font-weight:400; font-size:13px; opacity:.85; margin-top:2px; }
+</style>
+</head>
+<body>
+<p class="label">Mockup A: List · 390 px</p>
+<div class="phone">
+  <div class="status"></div>
+  <header>
+    <div>
+      <div class="day">Day 2 of 5 · Tuesday, Nov 18</div>
+      <h1>Today</h1>
+    </div>
+    <button class="gear" aria-label="Settings">⚙</button>
+  </header>
+
+  <div class="progress">
+    <span id="count">0 of 2 done</span>
+    <div class="bar"><i id="fill" style="width:0%"></i></div>
+  </div>
+
+  <ul>
+    <li><input type="checkbox" aria-label="Done"><span class="t">Apply for the corporate card</span><a href="#">Answer →</a></li>
+    <li><input type="checkbox" aria-label="Done"><span class="t">Book a meeting room for your 1:1 with your buddy</span><a href="#">Answer →</a></li>
+  </ul>
+
+  <p class="left">1 task left from Day 1 · <a href="#">Other days →</a></p>
+
+  <button class="ask">Who do I ask?<small>Password, corporate card, meeting rooms, leave…</small></button>
+</div>
+<script>
+  const boxes = document.querySelectorAll('li input');
+  boxes.forEach(b => b.addEventListener('change', () => {
+    b.closest('li').classList.toggle('done', b.checked);
+    const n = [...boxes].filter(x => x.checked).length;
+    document.getElementById('count').textContent = `${n} of ${boxes.length} done`;
+    document.getElementById('fill').style.width = `${n / boxes.length * 100}%`;
+  }));
+</script>
+</body>
+</html>

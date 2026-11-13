@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup B · Cards</title>
+<style>
+  :root { --ink:#1d1d1f; --muted:#6e6e73; --line:#e5e5ea; --accent:#2f6fde; --bg:#f2f2f7; --done:#34a853; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system, "Segoe UI", Roboto, sans-serif; background:#d9d9de; color:var(--ink); padding:24px 0; }
+  .label { text-align:center; font-size:13px; color:var(--muted); margin-bottom:12px; }
+  .phone { width:390px; min-height:844px; margin:0 auto; background:var(--bg); border-radius:36px; overflow:hidden; box-shadow:0 8px 30px rgba(0,0,0,.15); padding-bottom:24px; }
+  .status { height:44px; }
+  header { padding:8px 20px 12px; display:flex; justify-content:space-between; align-items:center; }
+  .day { font-size:13px; color:var(--muted); }
+  h1 { font-size:26px; font-weight:700; margin-top:2px; }
+  .ring { width:52px; height:52px; border-radius:50%; display:grid; place-items:center; font-size:13px; font-weight:600;
+          background:conic-gradient(var(--done) var(--p,0%), var(--line) 0); position:relative; }
+  .ring::before { content:""; position:absolute; inset:5px; background:var(--bg); border-radius:50%; }
+  .ring span { position:relative; }
+  .cards { padding:0 16px; display:grid; gap:12px; }
+  .card { background:#fff; border-radius:16px; padding:16px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+  .card .top { display:flex; gap:12px; align-items:flex-start; }
+  .card .n { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+  .card h2 { font-size:18px; font-weight:600; margin-top:2px; line-height:1.3; }
+  .card.done h2 { color:var(--muted); text-decoration:line-through; }
+  .check { flex:none; margin-left:auto; width:36px; height:36px; border-radius:50%; border:2px solid var(--line); background:#fff; font-size:18px; color:transparent; cursor:pointer; }
+  .card.done .check { background:var(--done); border-color:var(--done); color:#fff; }
+  .hint { margin-top:12px; padding-top:12px; border-top:1px solid var(--line); font-size:14px; color:var(--muted); display:flex; justify-content:space-between; }
+  .hint a { color:var(--accent); text-decoration:none; }
+  .ask { margin:16px 16px 0; background:#fff; border-radius:16px; padding:16px; }
+  .ask h3 { font-size:17px; }
+  .ask p { font-size:14px; color:var(--muted); margin:2px 0 12px; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chips a { padding:8px 12px; border-radius:999px; background:#e8effc; color:var(--accent); font-size:14px; text-decoration:none; }
+  .foot { display:flex; justify-content:space-between; padding:16px 20px 0; font-size:14px; }
+  .foot a { color:var(--accent); text-decoration:none; }
+  .foot span { color:var(--muted); }
+</style>
+</head>
+<body>
+<p class="label">Mockup B: Cards · 390 px</p>
+<div class="phone">
+  <div class="status"></div>
+  <header>
+    <div>
+      <div class="day">Day 2 of 5 · Tuesday, Nov 18 · ⚙</div>
+      <h1>Today</h1>
+    </div>
+    <div class="ring" id="ring"><span id="count">0/2</span></div>
+  </header>
+
+  <div class="cards">
+    <div class="card">
+      <div class="top">
+        <div><div class="n">Task 1</div><h2>Apply for the corporate card</h2></div>
+        <button class="check" aria-label="Mark done">✓</button>
+      </div>
+      <div class="hint"><span>Contact: Business Support</span><a href="#">Answer →</a></div>
+    </div>
+    <div class="card">
+      <div class="top">
+        <div><div class="n">Task 2</div><h2>Book a meeting room for your 1:1 with your buddy</h2></div>
+        <button class="check" aria-label="Mark done">✓</button>
+      </div>
+      <div class="hint"><span>Contact: Business Support</span><a href="#">Answer →</a></div>
+    </div>
+  </div>
+
+  <div class="ask">
+    <h3>Stuck? Who do I ask?</h3>
+    <p>These are normal first-week questions.</p>
+    <div class="chips">
+      <a href="#">Groupware password</a><a href="#">Corporate card</a><a href="#">Meeting rooms</a><a href="#">Leave</a><a href="#">More…</a>
+    </div>
+  </div>
+
+  <div class="foot"><span>1 task left from Day 1</span><a href="#">Other days →</a></div>
+</div>
+<script>
+  const cards = document.querySelectorAll('.card');
+  cards.forEach(c => c.querySelector('.check').addEventListener('click', () => {
+    c.classList.toggle('done');
+    const n = document.querySelectorAll('.card.done').length;
+    document.getElementById('count').textContent = `${n}/${cards.length}`;
+    document.getElementById('ring').style.setProperty('--p', `${n / cards.length * 100}%`);
+  }));
+</script>
+</body>
+</html>
